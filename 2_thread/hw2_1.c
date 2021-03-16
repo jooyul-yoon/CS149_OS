@@ -1,9 +1,4 @@
-/* 
- * matrix_multiply.c
- * 
- * Created on: Mar 1, 2021
- * Author: Jooyul Yoon
- */
+
 
 #include <pthread.h>
 #include <unistd.h>
