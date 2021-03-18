@@ -17,6 +17,9 @@
 #define MAXLINE 80 /* The maximum length of a command line */
 #define MAXARGS 40 /* The maximum # of tokens in command line */
 
+// shared memory
+#define SHM_NAME = "cs149shell"
+
 /* This method is used to remove the newline from cmdline */
 char *choppy( char *s )
 {
