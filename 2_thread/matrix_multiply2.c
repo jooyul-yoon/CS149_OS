@@ -36,8 +36,11 @@ int outm[OUTM_ROW][OUTM_COL];
 typedef struct 
 {
     /* data */
-    int param1;
-    int param2;
+    int thread_number;
+    int row;
+    int rowcnt;
+    int col;
+    int colcnt;
 } parameter;
 
 void* t_function(void*);
@@ -64,9 +67,12 @@ int main(int argc, char *argv[])
             for(int j = 0; j < OUTM_COL; j++){
                 // store target row and target column information into data block
                 parameter *data = (parameter *)malloc(sizeof(parameter));
-
-                data->param1 = i; // target row #
-                data->param2 = j; // target col #
+                
+                data->thread_number = thread_count;
+                data->row = i; // target row #
+                data->col = j; // target col #
+                data->rowcnt = 1;
+                data->colcnt = 1;
 
                 // create a thread
                 printf("thread[%d]: row= %d, col= %d\n", thread_count, i, j);
@@ -119,12 +125,16 @@ int main(int argc, char *argv[])
 
             // store information into data block
             parameter *data = (parameter *)malloc(sizeof(parameter));
-            data->param1 = first_row;      // first row of each thread
-            data->param2 = row_per_thread; // # of rows of each thread
+            data->thread_number = thread_count;
+            data->row = first_row;      // first row of each thread
+            data->rowcnt = row_per_thread; // # of rows of each thread
+            data->col = 0;
+            data->colcnt = OUTM_COL;
+            
 
             // create thread
-            printf("thread[%d] - first row= %d, number of rows = %d\n", thread_count, data->param1, data->param2);
-            pthread_create(&threads[thread_count], NULL, t_function2, (void *)data);
+            printf("thread[%d] - first row = %d, number of rows = %d\n", thread_count, data->row, data->rowcnt);
+            pthread_create(&threads[thread_count], NULL, t_function, (void *)data);
             
             // deallocate each data block
             free(data);
@@ -152,50 +162,26 @@ int main(int argc, char *argv[])
     return 0;   
 }
 
-
-// Each thread computes single element in the resultant matrix
-// param1 : target row #, param2 : target column #
-void* t_function(void* arg) 
-{ 
-    // declare variables
-    parameter *data = (parameter *)arg;
-    int row = data->param1;
-    int col = data->param2;
-    int sum = 0;
-    
-    // compute multiplication
-    for(int i = 0; i < INPM1_COL; i++){
-        sum += inpm1[row][i] * inpm2[i][col];
-    }
-
-    // store the sum value in the resultant matrix
-    outm[row][col] = sum;
-
-    // thread exit
-    pthread_exit(NULL);
-}
-
 // Each thread computes resultant matrix in certain row
 // param1 : first row of each thread, param2 : # of rows in thread
-void* t_function2(void *arg) {
+void* t_function(void *arg) {
     // declare variables
     parameter *data = (parameter *)arg;
-    int first_row = data->param1;
-    int row_per_thread = data->param2;
+    int thread_number = data->thread_number;
+    int row = data->row;
+    int rowcnt = data->rowcnt;
+    int col = data->col;
+    int colcnt = data->colcnt;
     
-    for(int row = first_row; row < first_row + row_per_thread; row++){ // row range
-        for(int col = 0; col < INPM1_COL; col++){
-            
-            // compute multiplication of each element
+    for(int i = row; i < row + rowcnt; i++) {
+        for(int j = col; j < col + colcnt; j++){
             int sum = 0;
             for(int i = 0; i < INPM1_COL; i++){
                 sum += inpm1[row][i] * inpm2[i][col];
             }
             outm[row][col] = sum;
-
         }
     }
-    
     // thread exit
     pthread_exit(NULL);
 }
