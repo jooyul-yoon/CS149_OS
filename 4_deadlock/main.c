@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <semaphore.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 /* the maximum time (in seconds) to eat and play */
 #define MAX_EAT_TIME 3
