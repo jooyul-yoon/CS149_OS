@@ -5,7 +5,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include <malloc/malloc.h>
 
 /* the maximum time (in seconds) to eat and play */
 #define MAX_EAT_TIME 3
